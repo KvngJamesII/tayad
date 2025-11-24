@@ -7,7 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Trash2, Upload } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Country } from "@shared/schema";
+
+interface Country {
+  id: string;
+  name: string;
+  code: string;
+  flagUrl?: string;
+  totalNumbers: number;
+  usedNumbers: number;
+  createdAt: string;
+}
 
 export function NumbersTab() {
   const { toast } = useToast();

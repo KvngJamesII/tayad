@@ -9,7 +9,25 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, History, RefreshCw, Copy, Check, MessageCircle, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Country, SmsMessage } from "@shared/schema";
+
+interface Country {
+  id: string;
+  name: string;
+  code: string;
+  flagUrl?: string;
+  totalNumbers: number;
+  usedNumbers: number;
+  createdAt: string;
+}
+
+interface SmsMessage {
+  id: string;
+  phoneNumber: string;
+  sender: string;
+  message: string;
+  receivedAt: string;
+  createdAt: string;
+}
 
 export default function CountryPage() {
   const [, params] = useRoute("/country/:id");

@@ -15,7 +15,19 @@ import CountryPage from "@/pages/country";
 import Admin from "@/pages/admin";
 import ModDashboard from "@/pages/mod";
 import Maintenance from "@/pages/maintenance";
-import type { User } from "@shared/schema";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+  isBanned?: boolean;
+}
 
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useQuery<User>({

@@ -8,7 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Send } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Notification } from "@shared/schema";
+
+interface Notification {
+  id: string;
+  userId?: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  isBroadcast: boolean;
+  createdAt: string;
+}
 
 export function NotificationsTab() {
   const { toast } = useToast();

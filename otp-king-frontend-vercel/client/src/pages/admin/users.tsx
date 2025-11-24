@@ -5,7 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Ban, CheckCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { User } from "@shared/schema";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+  isBanned?: boolean;
+}
 
 type UserWithStats = User & {
   numbersUsed: number;

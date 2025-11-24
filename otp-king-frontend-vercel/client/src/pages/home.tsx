@@ -7,7 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Globe, Smartphone, Zap } from "lucide-react";
 import { Link } from "wouter";
-import type { Country } from "@shared/schema";
+
+interface Country {
+  id: string;
+  name: string;
+  code: string;
+  flagUrl?: string;
+  totalNumbers: number;
+  usedNumbers: number;
+  createdAt: string;
+}
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");

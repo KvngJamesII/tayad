@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Smartphone } from "lucide-react";
-import { loginSchema, type LoginInput } from "@shared/schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginInput = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();

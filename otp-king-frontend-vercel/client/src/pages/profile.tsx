@@ -6,7 +6,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import type { User } from "@shared/schema";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+}
 
 export default function Profile() {
   const { toast } = useToast();

@@ -8,7 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, Edit2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Announcement } from "@shared/schema";
+
+interface Announcement {
+  id: string;
+  content: string;
+  isActive: boolean;
+  createdAt: string;
+}
 
 export function AnnouncementsTab() {
   const { toast } = useToast();

@@ -3,9 +3,20 @@ import { Header } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Upload } from "lucide-react";
-import type { User } from "@shared/schema";
 import { NumbersTab } from "@/pages/admin/numbers";
 import { StatisticsTab } from "@/pages/admin/statistics";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+}
 
 export default function ModDashboard() {
   const { data: user } = useQuery<User>({ queryKey: ["/api/auth/me"], retry: false });

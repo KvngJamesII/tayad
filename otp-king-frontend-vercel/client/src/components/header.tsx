@@ -11,8 +11,29 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import type { User as UserType, Notification } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+
+interface UserType {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+}
+
+interface Notification {
+  id: string;
+  userId?: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  isBroadcast: boolean;
+  createdAt: string;
+}
 
 export function Header() {
   const [, setLocation] = useLocation();

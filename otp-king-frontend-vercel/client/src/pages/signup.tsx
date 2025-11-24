@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Smartphone, Gift } from "lucide-react";
-import { signupSchema, type SignupInput } from "@shared/schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+const signupSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  email: z.string().email("Valid email required").optional().or(z.literal("")),
+  password: z.string().min(1, "Password is required"),
+  referralCode: z.string().optional().or(z.literal("")),
+});
+
+type SignupInput = z.infer<typeof signupSchema>;
 
 export default function Signup() {
   const [, setLocation] = useLocation();

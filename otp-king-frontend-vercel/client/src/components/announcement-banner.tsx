@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Announcement } from "@shared/schema";
+
+interface Announcement {
+  id: string;
+  content: string;
+  isActive: boolean;
+  createdAt: string;
+}
 
 export function AnnouncementBanner() {
   const { data: announcements } = useQuery<Announcement[]>({

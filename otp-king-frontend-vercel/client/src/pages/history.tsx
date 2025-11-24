@@ -2,9 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import type { NumberHistory } from "@shared/schema";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+interface NumberHistory {
+  id: string;
+  userId: string;
+  countryId: string;
+  phoneNumber: string;
+  usedAt: string;
+}
 
 type HistoryWithCountry = NumberHistory & {
   country: {

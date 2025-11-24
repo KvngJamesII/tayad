@@ -8,8 +8,30 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Gem, ShoppingCart, Gift, TrendingUp, History, AlertCircle } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { User, WalletTransaction } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  credits: number;
+  referralCode: string;
+  successfulReferrals: number;
+  createdAt: string;
+  isModerator: boolean;
+  isAdmin: boolean;
+}
+
+interface WalletTransaction {
+  id: string;
+  userId: string;
+  type: string;
+  amount: number;
+  description: string;
+  status: string;
+  transactionId?: string;
+  createdAt: string;
+}
 
 export default function Wallet() {
   const [giftCode, setGiftCode] = useState("");
