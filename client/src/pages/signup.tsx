@@ -1,51 +1,48 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Smartphone } from "lucide-react";
-import { loginSchema, type LoginInput } from "@shared/schema";
+import { Smartphone, Gift } from "lucide-react";
+import { signupSchema, type SignupInput } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function Login() {
+export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignupInput>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
       password: "",
+      email: "",
+      referralCode: "",
     },
   });
 
-  async function onSubmit(data: LoginInput) {
+  async function onSubmit(data: SignupInput) {
     try {
       setIsLoading(true);
-      const result = await apiRequest<{ isAdmin: boolean }>("POST", "/api/auth/login", data);
+      await apiRequest("POST", "/api/auth/signup", data);
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       
       toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
+        title: "Account created!",
+        description: "Welcome to OTP King! You've received 100 credits to get started.",
       });
 
-      // Redirect admin to admin panel, users to homepage
-      if (result.isAdmin) {
-        setLocation("/admin");
-      } else {
-        setLocation("/");
-      }
+      setLocation("/");
     } catch (error: any) {
       toast({
-        title: "Login failed",
-        description: error.message || "Invalid username or password",
+        title: "Signup failed",
+        description: error.message || "Could not create account",
         variant: "destructive",
       });
     } finally {
@@ -74,13 +71,17 @@ export default function Login() {
               </h1>
             </div>
           </div>
-          <p className="text-muted-foreground text-lg">Welcome back! Please login to continue.</p>
+          <p className="text-muted-foreground text-lg">Create your account and start using virtual numbers</p>
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-sm font-medium">
+            <Gift className="h-4 w-4 text-primary" />
+            <span className="text-primary font-semibold">Get 100 free credits on signup!</span>
+          </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your credentials to access your account</CardDescription>
+            <CardTitle>Sign Up</CardTitle>
+            <CardDescription>Get 100 free credits to start!</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -93,8 +94,27 @@ export default function Login() {
                       <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter your username" 
+                          placeholder="Choose a username" 
                           data-testid="input-username"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email (Optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email"
+                          placeholder="your@email.com"
+                          data-testid="input-email"
                           {...field} 
                         />
                       </FormControl>
@@ -112,11 +132,32 @@ export default function Login() {
                       <FormControl>
                         <Input 
                           type="password" 
-                          placeholder="Enter your password"
+                          placeholder="Create a strong password"
                           data-testid="input-password"
                           {...field} 
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="referralCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Referral Code (Optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter referral code if you have one"
+                          data-testid="input-referral"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Get bonus credits when you use a friend's referral code
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -128,15 +169,15 @@ export default function Login() {
                   disabled={isLoading}
                   data-testid="button-submit"
                 >
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
             </Form>
 
             <div className="mt-4 text-center text-sm">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-primary hover:underline" data-testid="link-signup">
-                Sign up
+              Already have an account?{" "}
+              <Link href="/login" className="text-primary hover:underline" data-testid="link-login">
+                Login
               </Link>
             </div>
           </CardContent>
