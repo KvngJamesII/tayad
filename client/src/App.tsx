@@ -13,6 +13,7 @@ import History from "@/pages/history";
 import Wallet from "@/pages/wallet";
 import CountryPage from "@/pages/country";
 import Admin from "@/pages/admin";
+import ModDashboard from "@/pages/mod";
 import Maintenance from "@/pages/maintenance";
 import type { User } from "@shared/schema";
 
@@ -92,6 +93,15 @@ function Router() {
         {() => (
           <AuthWrapper>
             <CountryPage />
+          </AuthWrapper>
+        )}
+      </Route>
+      
+      {/* Moderator Routes */}
+      <Route path="/mod">
+        {() => (
+          <AuthWrapper>
+            <ModDashboard />
           </AuthWrapper>
         )}
       </Route>

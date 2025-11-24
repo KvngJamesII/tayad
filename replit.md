@@ -36,7 +36,8 @@ Preferred communication style: Simple, everyday language.
 
 **Routing**: Wouter (lightweight client-side routing)
 - Public routes: `/login`, `/signup`, `/maintenance`
-- Protected user routes: `/` (home), `/country/:id`, `/profile`, `/history`
+- Protected user routes: `/` (home), `/country/:id`, `/profile`, `/history`, `/wallet`
+- Moderator routes: `/mod` (moderator dashboard with number upload and stats)
 - Admin routes: `/admin/*` with nested subroutes for different management panels
 
 **State Management**: 
@@ -69,8 +70,9 @@ Preferred communication style: Simple, everyday language.
 **Authentication Flow**:
 - bcrypt password hashing (salt rounds: 10)
 - IP address tracking on signup/login
-- Admin vs regular user role separation
-- Middleware guards: `requireAuth` and `requireAdmin`
+- Three-tier role separation: regular user, moderator, and admin
+- Middleware guards: `requireAuth`, `requireAdmin`, and `requireModerator`
+- Moderators can upload numbers and view statistics (partial admin access)
 
 **Rate Limiting**:
 - express-rate-limit implementation
@@ -94,7 +96,7 @@ Preferred communication style: Simple, everyday language.
 
 **Schema Design**:
 
-1. **users** - User accounts with authentication, credits, referral system, ban status
+1. **users** - User accounts with authentication, credits, referral system, ban status, moderator flag (isModerator)
 2. **countries** - Country metadata with phone number pools stored as text files
 3. **numberHistory** - Tracks which users used which numbers and when
 4. **smsMessages** - Stores received SMS (sender, message, timestamp) per phone number
@@ -202,9 +204,36 @@ Complete workflow for users to receive SMS on virtual numbers:
 - SMS messages stored with phone number for future reference
 - Rate limiting on number retrieval (10 req/min) and SMS checks (5 req/min)
 
+### 5. Moderator Feature Implementation
+Fully implemented three-tier role system with dedicated moderator functionality:
+
+**Moderator Features**:
+- Admins can promote users to moderators via `/admin/moderators` page
+- Search for users by username and click "Make Moderator" button
+- Moderators appear in a list and can be removed anytime
+- Moderators see a Shield icon button in the header linking to `/mod` dashboard
+- Moderator dashboard allows:
+  - Upload phone numbers by country (same as admin)
+  - View system statistics (same as admin)
+- Moderators can access `/api/admin/countries` and stats endpoints
+
+**How It Works**:
+1. Admin goes to **Admin Panel** → **Moderators**
+2. Admin enters a username and clicks "Make Moderator"
+3. User now has `isModerator` flag set to `true`
+4. Next time moderator logs in, they see a Shield icon in the header
+5. Clicking Shield takes them to moderator dashboard
+6. Moderator can upload numbers and view stats without full admin access
+
+**Database Changes**:
+- Added `isModerator` boolean field to users table (defaults to false)
+- New endpoint: `POST /api/admin/users/:id/moderator` to set moderator status
+
 ### Important Notes for Testing
 - To test admin functionality: **Log in as admin** (username: idledev, password: 200715)
-- All endpoints require admin authentication via `requireAdmin` middleware
+- To test moderator: Admin must promote a user via `/admin/moderators`
+- All endpoints require authentication via `requireAuth` middleware
+- Admin endpoints require `requireAdmin`, moderator endpoints require `requireModerator` (or admin)
 - Session-based authentication persists across navigation
 - Admin panel data auto-refreshes via React Query cache invalidation
 - SMS API token must be configured in admin panel for SMS checking to work

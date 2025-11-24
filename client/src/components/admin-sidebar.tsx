@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { BarChart3, Globe, Settings, Users, Bell, Megaphone, Wallet, Gift } from "lucide-react";
+import { BarChart3, Globe, Settings, Users, Bell, Megaphone, Wallet, Gift, Shield } from "lucide-react";
 import { useLocation } from "wouter";
 
 const menuItems = [
@@ -32,6 +32,11 @@ const menuItems = [
     title: "Users",
     icon: Users,
     path: "/admin/users",
+  },
+  {
+    title: "Moderators",
+    icon: Shield,
+    path: "/admin/moderators",
   },
   {
     title: "Notifications",

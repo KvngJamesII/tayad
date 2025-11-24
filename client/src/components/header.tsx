@@ -1,4 +1,4 @@
-import { Bell, User, Smartphone, Gem, Wallet } from "lucide-react";
+import { Bell, User, Smartphone, Gem, Wallet, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "./theme-toggle";
@@ -134,6 +134,13 @@ export function Header() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              {user.isModerator && (
+                <Link href="/mod">
+                  <Button variant="ghost" size="icon" className="relative" data-testid="button-mod-dashboard">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </Button>
+                </Link>
+              )}
               <Link href="/wallet">
                 <Badge 
                   variant="secondary" 

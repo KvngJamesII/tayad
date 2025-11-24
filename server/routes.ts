@@ -44,6 +44,14 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
   res.status(403).json({ message: "Admin access required" });
 }
 
+// Middleware to check if user is moderator
+function requireModerator(req: Request, res: Response, next: NextFunction) {
+  if (req.isAuthenticated() && (req.user?.isModerator || req.user?.isAdmin)) {
+    return next();
+  }
+  res.status(403).json({ message: "Moderator access required" });
+}
+
 // Rate limiters
 const numberLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -624,6 +632,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { ban } = req.body;
       await storage.updateUser(req.params.id, { isBanned: ban });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/admin/users/:id/moderator", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const { isModerator } = req.body;
+      await storage.updateUser(req.params.id, { isModerator });
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

@@ -6,6 +6,7 @@ import { StatisticsTab } from "./admin/statistics";
 import { NumbersTab } from "./admin/numbers";
 import { ApiSettingsTab } from "./admin/api-settings";
 import { UsersTab } from "./admin/users";
+import { ModeratorsTab } from "./admin/moderators";
 import { NotificationsTab } from "./admin/notifications";
 import { AnnouncementsTab } from "./admin/announcements";
 import { WalletTab } from "./admin/wallet";
@@ -32,6 +33,7 @@ export default function Admin() {
               <Route path="/admin/wallet" component={WalletTab} />
               <Route path="/admin/announcements" component={AnnouncementsTab} />
               <Route path="/admin/notifications" component={NotificationsTab} />
+              <Route path="/admin/moderators" component={ModeratorsTab} />
               <Route path="/admin/users" component={UsersTab} />
               <Route path="/admin/api" component={ApiSettingsTab} />
               <Route path="/admin/numbers" component={NumbersTab} />

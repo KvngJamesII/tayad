@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   successfulReferrals: integer("successful_referrals").notNull().default(0),
   isBanned: boolean("is_banned").notNull().default(false),
   isAdmin: boolean("is_admin").notNull().default(false),
+  isModerator: boolean("is_moderator").notNull().default(false),
   ipAddress: text("ip_address").notNull(),
   lastLoginDate: timestamp("last_login_date"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -150,6 +151,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   successfulReferrals: true,
   isBanned: true,
   isAdmin: true,
+  isModerator: true,
   lastLoginDate: true,
   createdAt: true,
 });
