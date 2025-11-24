@@ -713,12 +713,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/wallet/pricing", async (req: Request, res: Response) => {
     try {
-      const creditPrice = await storage.getSetting("credit_price");
-      res.json({ 
-        creditPrice: creditPrice ? parseFloat(creditPrice.value) : 1 
-      });
+      const pricingTiers = await storage.getSetting("pricing_tiers");
+      let tiers = [
+        { credits: 100, naira: 100 },
+        { credits: 500, naira: 450 },
+        { credits: 1000, naira: 800 },
+      ];
+      
+      if (pricingTiers) {
+        try {
+          tiers = JSON.parse(pricingTiers.value);
+        } catch (e) {
+          // Fall back to default if parsing fails
+        }
+      }
+      
+      res.json({ pricingTiers: tiers });
     } catch (error: any) {
-      res.json({ creditPrice: 1 });
+      res.json({ 
+        pricingTiers: [
+          { credits: 100, naira: 100 },
+          { credits: 500, naira: 450 },
+          { credits: 1000, naira: 800 },
+        ]
+      });
     }
   });
 
@@ -734,9 +752,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (response.data.status && response.data.data.status === "success") {
         const amount = Math.floor(response.data.data.amount / 100); // Convert from kobo
-        const creditPrice = await storage.getSetting("credit_price");
-        const pricePerCredit = creditPrice ? parseFloat(creditPrice.value) : 1;
-        const credits = Math.floor(amount / pricePerCredit);
+        
+        // Get pricing tiers
+        const pricingTiers = await storage.getSetting("pricing_tiers");
+        let tiers = [
+          { credits: 100, naira: 100 },
+          { credits: 500, naira: 450 },
+          { credits: 1000, naira: 800 },
+        ];
+        
+        if (pricingTiers) {
+          try {
+            tiers = JSON.parse(pricingTiers.value);
+          } catch (e) {
+            // Fall back to default
+          }
+        }
+        
+        // Find matching tier or calculate by rate
+        let credits = 0;
+        for (const tier of tiers) {
+          if (amount === tier.naira) {
+            credits = tier.credits;
+            break;
+          }
+        }
+        
+        // If no exact match, calculate by best rate
+        if (credits === 0) {
+          const bestRate = Math.min(...tiers.map(t => t.naira / t.credits));
+          credits = Math.floor(amount / bestRate);
+        }
 
         // Update user credits
         await storage.updateUser(user.id, {
@@ -781,10 +827,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/wallet/stats", requireAdmin, async (req: Request, res: Response) => {
     try {
       const stats = await storage.getWalletStats();
-      const pricing = await storage.getSetting("credit_price");
+      const pricingTiers = await storage.getSetting("pricing_tiers");
+      let tiers = [
+        { credits: 100, naira: 100 },
+        { credits: 500, naira: 450 },
+        { credits: 1000, naira: 800 },
+      ];
+      
+      if (pricingTiers) {
+        try {
+          tiers = JSON.parse(pricingTiers.value);
+        } catch (e) {
+          // Fall back to default
+        }
+      }
+      
       res.json({
         ...stats,
-        creditPrice: pricing ? parseFloat(pricing.value) : 1,
+        pricingTiers: tiers,
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -793,8 +853,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/wallet/pricing", requireAdmin, async (req: Request, res: Response) => {
     try {
-      const { creditPrice } = req.body;
-      await storage.setSetting({ key: "credit_price", value: creditPrice.toString() });
+      const { pricingTiers } = req.body;
+      
+      // Validate tiers
+      if (!Array.isArray(pricingTiers) || pricingTiers.length === 0) {
+        return res.status(400).json({ message: "At least one pricing tier is required" });
+      }
+      
+      for (const tier of pricingTiers) {
+        if (!tier.credits || !tier.naira || tier.credits <= 0 || tier.naira <= 0) {
+          return res.status(400).json({ message: "All tiers must have valid credits and naira values" });
+        }
+      }
+      
+      await storage.setSetting({ 
+        key: "pricing_tiers", 
+        value: JSON.stringify(pricingTiers.map(t => ({
+          credits: parseInt(t.credits),
+          naira: parseInt(t.naira)
+        })))
+      });
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
