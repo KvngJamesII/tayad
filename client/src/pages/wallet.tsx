@@ -73,12 +73,17 @@ export default function Wallet() {
     handler.openIframe();
   };
 
-  const creditPrice = pricing?.creditPrice || 1; // N per credit
-  const packages = [
-    { credits: 1000, price: 1000 * creditPrice },
-    { credits: 5000, price: 5000 * creditPrice },
-    { credits: 10000, price: 10000 * creditPrice },
+  // Use pricing tiers from admin panel
+  const pricingTiers = pricing?.pricingTiers || [
+    { credits: 100, naira: 100 },
+    { credits: 500, naira: 450 },
+    { credits: 1000, naira: 800 },
   ];
+  
+  const packages = pricingTiers.map((tier) => ({
+    credits: tier.credits,
+    price: tier.naira,
+  }));
 
   if (!user) {
     return (
@@ -135,31 +140,36 @@ export default function Wallet() {
             <TabsContent value="purchase" className="space-y-6 mt-6">
               <div>
                 <h2 className="text-2xl font-bold mb-4">Buy Credits</h2>
-                <p className="text-sm text-muted-foreground mb-4">1 Credit = ₦{creditPrice}</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {packages.map((pkg) => (
-                    <Card key={pkg.credits} className="hover-elevate cursor-pointer">
-                      <CardContent className="pt-6">
-                        <div className="text-center space-y-4">
-                          <div>
-                            <p className="text-3xl font-bold text-primary">{pkg.credits.toLocaleString()}</p>
-                            <p className="text-sm text-muted-foreground">Credits</p>
+                  {packages.map((pkg) => {
+                    const pricePerCredit = (pkg.price / pkg.credits).toFixed(2);
+                    return (
+                      <Card key={pkg.credits} className="hover-elevate cursor-pointer">
+                        <CardContent className="pt-6">
+                          <div className="text-center space-y-4">
+                            <div>
+                              <p className="text-3xl font-bold text-primary">{pkg.credits.toLocaleString()}</p>
+                              <p className="text-sm text-muted-foreground">Credits</p>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              ₦{pricePerCredit} per credit
+                            </div>
+                            <div className="border-t pt-4">
+                              <p className="text-2xl font-bold">₦{(pkg.price).toLocaleString()}</p>
+                              <Button
+                                className="w-full mt-4 bg-gradient-to-r from-primary to-secondary"
+                                onClick={() => handlePaystack(pkg.price)}
+                                disabled={paystackMutation.isPending}
+                                data-testid={`button-buy-${pkg.credits}`}
+                              >
+                                Buy Now
+                              </Button>
+                            </div>
                           </div>
-                          <div className="border-t pt-4">
-                            <p className="text-2xl font-bold">₦{(pkg.price).toLocaleString()}</p>
-                            <Button
-                              className="w-full mt-4 bg-gradient-to-r from-primary to-secondary"
-                              onClick={() => handlePaystack(pkg.price)}
-                              disabled={paystackMutation.isPending}
-                              data-testid={`button-buy-${pkg.credits}`}
-                            >
-                              Buy Now
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
               <script src="https://js.paystack.co/v1/inline.js" async></script>
